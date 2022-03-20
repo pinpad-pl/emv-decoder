@@ -24,6 +24,9 @@ export class EmvDecoder {
         if (emvTag.tag) {
             res += `TAG: ${emvTag.tag}`;
         }
+
+        res+= "\n";
+
         for (let i = 0; i < emvTag.bits.length; i++) {
             const byte = Math.floor(i / 8) + 1;
             const bit = i % 8 + 1;
@@ -88,7 +91,7 @@ export class EmvDecoder {
         } else {
             buf = Buffer.from(value, "base64");
             hexValue = buf.toString("hex");
-            result += `HEX value: ${base64Value}\n`;
+            result += `HEX value: ${hexValue}\n`;
         }
 
         result += "\n\n";
