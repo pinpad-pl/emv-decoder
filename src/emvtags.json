@@ -1,0 +1,231 @@
+{"emvTags": [
+    {
+        "name": "TVR (or TAC)",
+        "tag": "95",
+        "length": 5,
+        "bits": [
+            "RFU", "RFU",
+            "CDA failed",
+            "DDA failed",
+            "Card appears on terminal exception file",
+            "ICC data missing",
+            "SDA failed",
+            "Offline data authentication was not performed",
+
+            "RFU", "RFU", "RFU",
+            "New card",
+            "Requested service not allowed for card product",
+            "Application not yet effective",
+            "Expired application",
+            "ICC and terminal have different application versions",
+
+            "RFU", "RFU",
+            "Online PIN entered",
+            "PIN entry required, PIN pad present, but PIN was not entered",
+            "PIN entry required and PIN pad not present or not working",
+            "PIN Try Limit exceeded",
+            "Unrecognised CVM",
+            "Cardholder verification was not successful",
+
+            "RFU", "RFU", "RFU",
+            "Merchant forced transaction online",
+            "Transaction selected randomly for online processing",
+            "Upper consecutive offline limit exceeded",
+            "Lower consecutive offline limit exceeded",
+            "Transaction exceeds floor limit",
+
+            "Relay-resistance (RRP) supported but not performed",
+            "Relay-ressistance (RRP) performed",
+            "Relay resistance time limits exceeded",
+            "Relay resistance threshold exceeded",
+            "Script processing failed after final GENERATE AC",
+            "Script processing failed before final GENERATE AC",
+            "Issuer authentication failed",
+            "Default TDOL used"
+        ]
+    },
+
+    {
+        "name": "Terminal Capabilities",
+        "tag": "9F33",
+        "length": 3,
+        "bits": [
+            "RFU", "RFU", "RFU", "RFU", "RFU", 
+            "IC with contacts",
+            "Magnetic stripe",
+            "Manual key entry",
+
+            "RFU", "RFU", "RFU", 
+            "No CVM Required",
+            "Enciphered PIN for offline verification",
+            "Signature (paper)",
+            "Enciphered PIN for online verification",
+            "Plaintext PIN for ICC verification",
+
+            "RFU", "RFU", "RFU", "CDA", "RFU", "Card capture", "DDA", "SDA"
+        ]
+    },
+
+    {
+        "name": "Additional Terminal Capabilities",
+        "tag": "9F40",
+        "length": 5,
+        "bits": [
+            "Administrative",
+            "Payment",
+            "Transfer",
+            "Inquiry",
+            "Cashback",
+            "Services",
+            "Goods",
+            "Cash",
+
+            "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU",
+            "Cash Deposit",
+
+            "RFU", "RFU", "RFU", "RFU",
+            "Function keys",
+            "Command keys",
+            "Alphabetic and special characters keys",
+            "Numeric keys",
+
+            "Code table 9",
+            "Code table 10",
+            "RFU", "RFU",
+            "Display, cardholder",
+            "Display, attendant",
+            "Print, cardholder",
+            "Print, attendant",
+
+            "Code table 1",
+            "Code table 2",
+            "Code table 3",
+            "Code table 4",
+            "Code table 5",
+            "Code table 6",
+            "Code table 7",
+            "Code table 8"  
+        ]
+    },
+
+    {
+        "name": "Application Interchange Profile",
+        "tag": "82",
+        "length": 2,
+        "bits": [
+            "CDA supported",
+            "On device cardholder verification is supported",
+            "Issuer authentication is supported",
+            "Terminal risk management is to be performed",
+            "Cardholder verification is supported",
+            "DDA supported",
+            "SDA supported",
+            "RFU",
+
+            "Relay resistance protocol is supported",
+            "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", 
+            "EMV mode is supported (kernel C-2)/Magstripe mode is supported (kernel C-3)"
+        ]
+    },
+
+    {
+        "name": "Transaction Status Information",
+        "tag": "9B",
+        "length": 2,
+        "bits": [
+            "RFU", "RFU",
+            "Script processing was performed",
+            "Terminal risk management was performed",
+            "Issuer authentication was performed",
+            "Card risk management was performed",
+            "Cardholder verification was performed",
+            "Offline data authentication was performed",
+
+            "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU"
+        ]
+    },
+
+    {
+        "name": "CTQ - Card Transaction Qualifiers (kernel C-3)",
+        "tag": "9F6C",
+        "length": 2,
+        "bits": [
+            "Not valid for contactless ATM transactions",
+            "Switch Interface for Cashback Transactions",
+            "Switch Interface for Cash Transactions",
+            "Go Online if Application Expired",
+            "Switch Interface if Offline Data Authentication fails and Reader supports contact chip",
+            "Go Online if Offline Data Authentication Fails and Reader is online capable",
+            "Signature Required",
+            "Online PIN Required",
+
+            "RFU", "RFU", "RFU", "RFU", "RFU", "RFU",
+            "Card supports Issuer Update Processing at the POS",
+            "Consumer Device CVM Performed"
+        ]
+    },
+
+    {
+        "name": "TTQ - Terminal Transaction Qualifiers (kernel C-3)",
+        "tag": "9F66",
+        "length": 4,
+        "bits": [
+            "Offline Data Authentication for Online Authorizations supported",
+            "Signature supported",
+            "Online PIN supported",
+            "Offline-only reader",
+            "EMV contact chip supported",
+            "EMV mode supported",
+            "RFU",
+            "Mag-stripe mode supported",
+
+            "RFU", "RFU", "RFU", "RFU", "RFU",
+            "(Contact Chip) Offline PIN supported",
+            "CVM required (this bit is adjusted during transaction)",
+            "Online cryptogram required (this bit is adjusted during transaction)",
+
+            "RFU", "RFU", "RFU", "RFU", "RFU", "RFU",
+            "Consumer Device CVM supported",
+            "Issuer Update Processing supported",
+
+            "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU"
+
+        ]
+    },
+
+    {
+        "name": "Terminal Risk Management Data (C-2/Paypass - specific)",
+        "tag": "9F1D",
+        "length": 8,
+        "bits": [
+            "RFU", "RFU",
+            "On device cardholder verification (Contactless)",
+            "No CVM required (Contactless)",
+            "Enciphered PIN verification performed by ICC (Contactless)",
+            "Signature (paper) (Contactless)",
+            "Enciphered PIN verified online (Contactless)",
+            "Plaintext PIN verification performed by ICC (Contactless)",
+
+            "RFU", "RFU",
+            "On device cardholder verification (Contact)",
+            "No CVM required (Contact)",
+            "Enciphered PIN verification performed by ICC (Contact)",
+            "Signature (paper) (Contact)",
+            "Enciphered PIN verified online (Contact)",
+            "Plaintext PIN verification performed by ICC (Contact)",
+
+            "RFU", "RFU", "RFU", "RFU", "RFU", "RFU",
+            "Only mag-stripe mode contactless transactions supported",
+            "Only EMV mode contactless transactions supported",
+
+            "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU",
+            "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU",
+            "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU",
+            "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU",
+            "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU"
+        ]
+    }
+
+
+]
+}

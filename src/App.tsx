@@ -1,26 +1,29 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {useState} from 'react';
+import {Text, View, TextInput} from 'react-native';
+import { EmvDecoder } from './EmvDecoder';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+
+const App = () => {
+    const valueFromUrl = new URLSearchParams(window.location.search)?.get("value");
+    const initialRsult = (valueFromUrl)? EmvDecoder.processValue(valueFromUrl) : "";
+    const [result, setResult] = useState(EmvDecoder.processValue(initialRsult));
+
+    return (
+        <View >
+            <View>
+                <br></br>
+                <TextInput
+                    defaultValue={valueFromUrl || undefined}
+                    placeholder="Type/paste a hex or base64 value"
+                    onChangeText={inputValue => { setResult(EmvDecoder.processValue(inputValue)) } }
+                />
+
+                <Text>
+                    <br></br> {result}
+                </Text>
+            </View>
+        </View>
+    );
+};
 
 export default App;
