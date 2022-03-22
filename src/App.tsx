@@ -15,7 +15,13 @@ const App = () => {
                 <TextInput
                     defaultValue={valueFromUrl || undefined}
                     placeholder="Type/paste a hex or base64 value"
-                    onChangeText={inputValue => { setResult(EmvDecoder.processValue(inputValue)) } }
+                    onChangeText={inputValue => {
+                        setResult(EmvDecoder.processValue(inputValue));
+                        if (window.history.pushState) {
+                            const newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?value=' + encodeURIComponent(inputValue);
+                            window.history.pushState({path:newurl},'',newurl);
+                        }
+                    } }
                 />
 
                 <Text>
