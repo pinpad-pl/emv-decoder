@@ -224,6 +224,42 @@
             "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU",
             "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU"
         ]
+    },
+
+    {
+        "name": "CVM results",
+        "tag": "9F34",
+        "length": 3,
+        "bytes":[
+            {
+                "02": "Online PIN",
+                "42": "Online PIN",
+                "1F": "No CVM Required",
+                "5F": "No CVM Required",
+                "1E": "Signature",
+                "5E": "Signature",
+                "00": "Fail CVM",
+                "40": "Fail CVM",
+                "3F": "Unrecognized CVM"
+            },
+            {
+                "00": "Always",
+                "01": "If unattended cash",
+                "02": "If not unattended cash and not manual cash and not purchase with cashback",
+                "03": "If terminal supports the CVM",
+                "04": "If manual cash",
+                "05": "If purchase with cashback",
+                "06": "If transaction is in the application currency and is under X value (see section 10.5 of EMV Book 3 for a discussion of “X”)",
+                "07": "If transaction is in the application currency and is over X value",
+                "08": "If transaction is in the application currency and is under Y value (see section 10.5 of EMV Book 3 for a discussion of “Y”)",
+                "09": "If transaction is in the application currency and is over Y value"
+            },
+            {
+                "00": "Success",
+                "01": "Failed"
+            }
+        ]
+
     }
 
 

@@ -1,48 +1,91 @@
 import { Buffer } from "buffer";
 import tags from './emvtags.json';
 
-
 interface EmvTag {
     name: string;
     tag?: string;
     length: number;
-    bits: string[];
+    bits?: string[];
+    bytes?: any[];
 }
+
+type DecodedTag = {
+    numberOfRFUs: number;
+    result: string;
+};
 
 export class EmvDecoder {
 
     private static validateTagsArray(tagsArray: EmvTag[]) {
         for(const tag of tagsArray) {
-            if (tag.bits.length / 8 != tag.length) {
-                return tag.name || "Unknown tag";
+            if (tag.bits?.length) {
+                if (tag.bits.length / 8 != tag.length) {
+                    return tag.name || "Unknown tag";
+                }
             }
+            if (tag.bytes?.length) {
+                if (tag.bytes.length != tag.length) {
+                    return tag.name || "Uknown tag";
+                }
+            }
+
         }
         return undefined;
     }
-    private static decodeTag(buf: Buffer, emvTag: EmvTag): string {
-        let res = `${emvTag.name}:\n`;
+    private static decodeTag(buf: Buffer, emvTag: EmvTag): DecodedTag {
+        const res: DecodedTag = {
+            numberOfRFUs: 0,
+            result: `${emvTag.name}:\n`
+        };
+
         if (emvTag.tag) {
-            res += `TAG: ${emvTag.tag}`;
+            res.result += `TAG: ${emvTag.tag}`;
         }
 
-        res+= "\n";
+        res.result += "\n";
 
-        for (let i = 0; i < emvTag.bits.length; i++) {
-            const byte = Math.floor(i / 8) + 1;
-            const bit = i % 8 + 1;
-            if (buf[byte - 1] & (1 << (bit - 1))) {
-                res += `Byte ${byte} bit ${bit}: ${emvTag.bits[i]}\n`;
+        if (emvTag.bits) {
+            for (let i = 0; i < emvTag.bits.length; i++) {
+                const byte = Math.floor(i / 8) + 1;
+                const bit = i % 8 + 1;
+                if (buf[byte - 1] & (1 << (bit - 1))) {
+                    res.result += `Byte ${byte} bit ${bit}: ${emvTag.bits[i]}\n`;
+                    if (emvTag.bits[i] == "RFU") {
+                        res.numberOfRFUs++;
+                    }
+                }
             }
         }
-        res += "\n\n";
+        if (emvTag.bytes) {
+            for (let i = 0; i < buf.length; i++) {
+                let hexByte = buf[i].toString(16).toUpperCase();
+                if (hexByte.length < 2) {
+                    hexByte = "0" + hexByte;
+                }
+
+                const byteDesc = emvTag.bytes[i][hexByte];
+                res.result += `Byte ${i + 1} (${hexByte}): ${byteDesc || "RFU"}\n`;
+                if (byteDesc == "RFU" || !byteDesc) {
+                    res.numberOfRFUs++;
+                }
+            }
+        }
+        res.result += "\n\n";
         return res;
     }
+
     private static decodeTags(buf: Buffer): string {
         let res = "";
+        const decodedTags: DecodedTag[] = [];
         for(const tag of tags.emvTags) {
             if (tag.length == buf.length) {
-                res += this.decodeTag(buf, tag);
+                decodedTags.push(this.decodeTag(buf, tag));
             }
+        }
+        decodedTags.sort((a, b) => {return a.numberOfRFUs - b.numberOfRFUs});
+
+        for (const decodedTag of decodedTags) {
+            res += decodedTag.result;
         }
         return res;
     }
@@ -68,13 +111,17 @@ export class EmvDecoder {
             hexValue = value;
         }
 
+        let result = "\n\n";
+
         if (!hexValue && !base64Value) {
-            return `Can't recognize encoding for value: ${value}`;
+            result += `Can't recognize encoding for value: ${value}`;
+            return result;
         }
+
+        result += `Source string length: ${value.length}\n`;
 
         const recognizedEncoding = (hexValue)? "HEX" : "BASE64";
 
-        let result = "\n\n";
 
         if (hexValue && base64Value) {
             result += "WARNING: THE ENTERED VALUE COULD EITHER BE HEX, or BASE64\n";
@@ -96,6 +143,8 @@ export class EmvDecoder {
             hexValue = buf.toString("hex");
             result += `HEX value: ${hexValue}\n`;
         }
+
+        result += `Length in bytes: ${buf.length}`;
 
         result += "\n\n";
 
