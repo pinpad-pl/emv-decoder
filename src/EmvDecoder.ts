@@ -114,7 +114,7 @@ export class EmvDecoder {
         let result = "\n\n";
 
         if (!hexValue && !base64Value) {
-            result += `Can't recognize encoding for value: ${value}`;
+            result += `Can't recognize encoding for value: ${value}\n`;
             return result;
         }
 

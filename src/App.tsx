@@ -5,8 +5,8 @@ import { EmvDecoder } from './EmvDecoder';
 
 const App = () => {
     const valueFromUrl = new URLSearchParams(window.location.search)?.get("value");
-    const initialRsult = (valueFromUrl)? EmvDecoder.processValue(valueFromUrl) : "";
-    const [result, setResult] = useState(EmvDecoder.processValue(initialRsult));
+    const initialRsult = (valueFromUrl?.trim())? EmvDecoder.processValue(valueFromUrl) : "";
+    const [result, setResult] = useState(initialRsult);
 
     return (
         <View >
