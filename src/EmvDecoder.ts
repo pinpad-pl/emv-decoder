@@ -4,17 +4,48 @@ import tags from './emvtags.json';
 interface EmvTag {
     name: string;
     tag?: string;
+    alias?: string;
     length: number;
     bits?: string[];
     bytes?: any[];
 }
 
-type DecodedTag = {
-    numberOfRFUs: number;
-    result: string;
-};
+class DecodedTag  {
+    numberOfRFUs = 0;
+    private static readonly INDENT_SIZE = 5;
+
+
+    private result = "";
+    private indentLevel = 0;
+
+    getResult(): string {
+        return this.result;
+    }
+
+    addToString(newString: string): void {
+        const indent = (this.indentLevel && this.indentLevel < 20)? "                    ".slice(0, this.indentLevel) : "";
+        this.result += `${indent}${newString}\n`;
+    }
+
+    increaseIndent(): void {
+        this.indentLevel += DecodedTag.INDENT_SIZE;
+    }
+
+    decreaseIndent(): void {
+        this.indentLevel -= DecodedTag.INDENT_SIZE;
+    }
+
+}
 
 export class EmvDecoder {
+
+    private static findEmvTag(alias: string): EmvTag | undefined {
+        for (const tag of tags.emvTags) {
+            if (tag.alias == alias) {
+                return tag;
+            }
+        }
+    }
 
     private static validateTagsArray(tagsArray: EmvTag[]) {
         for(const tag of tagsArray) {
@@ -24,7 +55,20 @@ export class EmvDecoder {
                 }
             }
             if (tag.bytes?.length) {
-                if (tag.bytes.length != tag.length) {
+                let numberOfBytes = 0;
+                console.log(`Number of bytes for tag ${tag.name}: ${tag.bytes.length}`);
+                for (let i = 0; i < tag.bytes.length; i++) {
+                    const byteValue = (tag.bytes[i] as any)["XX"];
+                    if (byteValue && byteValue.length && (byteValue.name || byteValue.followAlias)) {
+                        console.log(`adding ${byteValue.length} bytes`);
+                        numberOfBytes += byteValue.length;
+                    } else {
+                        console.log(`adding 1 byte`);
+                        numberOfBytes++;
+                    }
+                }
+                if (numberOfBytes != tag.length) {
+                    console.error(`${numberOfBytes} != ${tag.length}`);
                     return tag.name || "Uknown tag";
                 }
             }
@@ -32,24 +76,25 @@ export class EmvDecoder {
         }
         return undefined;
     }
-    private static decodeTag(buf: Buffer, emvTag: EmvTag): DecodedTag {
-        const res: DecodedTag = {
-            numberOfRFUs: 0,
-            result: `${emvTag.name}:\n`
-        };
+
+    private static decodeTag(buf: Buffer, emvTag: EmvTag, currentResult?: DecodedTag): DecodedTag {
+        const res = currentResult ??  new DecodedTag();
+
+
+        res.addToString(`${emvTag.name}: ${buf.toString('hex').toUpperCase()}`);
 
         if (emvTag.tag) {
-            res.result += `TAG: ${emvTag.tag}`;
+            res.addToString(`TAG: ${emvTag.tag}`);
         }
 
-        res.result += "\n";
+        res.addToString("");
 
         if (emvTag.bits) {
             for (let i = 0; i < emvTag.bits.length; i++) {
                 const byte = Math.floor(i / 8) + 1;
                 const bit = i % 8 + 1;
                 if (buf[byte - 1] & (1 << (bit - 1))) {
-                    res.result += `Byte ${byte} bit ${bit}: ${emvTag.bits[i]}\n`;
+                    res.addToString(`Byte ${byte} bit ${bit}: ${emvTag.bits[i]}`);
                     if (emvTag.bits[i] == "RFU") {
                         res.numberOfRFUs++;
                     }
@@ -57,35 +102,62 @@ export class EmvDecoder {
             }
         }
         if (emvTag.bytes) {
-            for (let i = 0; i < buf.length; i++) {
-                let hexByte = buf[i].toString(16).toUpperCase();
+            for (let i = 0, j = 0; i < buf.length && j < buf.length; i++, j++) {
+                console.log(`i=${i}, j=${j}, buflen=${buf.length}`);
+                let hexByte = buf[j].toString(16).toUpperCase();
                 if (hexByte.length < 2) {
                     hexByte = "0" + hexByte;
                 }
 
-                const byteDesc = emvTag.bytes[i][hexByte];
-                res.result += `Byte ${i + 1} (${hexByte}): ${byteDesc || "RFU"}\n`;
+                console.log(`i=${i}, j=${j}, buflen=${buf.length}, name: ${emvTag.name}, hexByte: ${hexByte}`);
+
+                if (!emvTag.bytes[i]) {
+                    continue;
+                }
+                const byteDesc = emvTag.bytes[i][hexByte] || emvTag.bytes[i]["XX"];
+                if (byteDesc === "") {
+                    continue;
+                }
+                if (typeof byteDesc == 'string') {
+                    res.addToString(`Byte ${i + 1} (${hexByte}): ${byteDesc || "RFU"}`);
+                } else {
+                    const subTagLen = byteDesc.length;
+                    if (subTagLen) {
+                        console.log(`Subtag len on pos ${i}: ${subTagLen}`);
+                        const subArray = buf.subarray(j, j + subTagLen);
+                        res.addToString(`Bytes ${j+1} - ${j + subTagLen}`);
+                        res.increaseIndent();
+                        console.log(`Deconding hex: ${subArray.toString('hex')}`);
+                        const tagDef = byteDesc.name? byteDesc : this.findEmvTag(byteDesc.followAlias);
+                        this.decodeTag(subArray, tagDef, res);
+                        console.log("Decoded");
+                        j += subTagLen -1;
+                        res.decreaseIndent();
+                    }
+                }
                 if (byteDesc == "RFU" || !byteDesc) {
                     res.numberOfRFUs++;
                 }
             }
         }
-        res.result += "\n\n";
+        res.addToString("\n");
         return res;
     }
 
     private static decodeTags(buf: Buffer): string {
         let res = "";
+        console.log("Looking for matching tags");
         const decodedTags: DecodedTag[] = [];
         for(const tag of tags.emvTags) {
             if (tag.length == buf.length) {
+                console.log(`Matching length for tag ${tag.name}`);
                 decodedTags.push(this.decodeTag(buf, tag));
             }
         }
         decodedTags.sort((a, b) => {return a.numberOfRFUs - b.numberOfRFUs});
 
         for (const decodedTag of decodedTags) {
-            res += decodedTag.result;
+            res += decodedTag.getResult();
         }
         return res;
     }
@@ -95,6 +167,14 @@ export class EmvDecoder {
 
         if (!value) {
             return "";
+        }
+
+        let forceBase64 = false;
+
+
+        if (value[0] == "=") {
+            value = value.slice(1);
+            forceBase64 = true;
         }
 
         const base64Regex = /^([0-9a-zA-Z+/]{4})*(([0-9a-zA-Z+/]{2}==)|([0-9a-zA-Z+/]{3}=))?$/;
@@ -111,20 +191,21 @@ export class EmvDecoder {
             hexValue = value;
         }
 
-        let result = "\n\n";
+        let result = `\n\nSource string length: ${value.length}\n`;
 
         if (!hexValue && !base64Value) {
             result += `Can't recognize encoding for value: ${value}\n`;
             return result;
         }
 
-        result += `Source string length: ${value.length}\n`;
 
-        const recognizedEncoding = (hexValue)? "HEX" : "BASE64";
+        const recognizedEncoding = (hexValue && !forceBase64)? "HEX" : "BASE64";
 
 
-        if (hexValue && base64Value) {
-            result += "WARNING: THE ENTERED VALUE COULD EITHER BE HEX, or BASE64\n";
+        if (hexValue && base64Value && !forceBase64) {
+            result += `
+            WARNING: THE ENTERED VALUE COULD EITHER BE HEX, or BASE64
+            In order to force BASE64, use "=" at the beggining of the string (e.g. "=AAAA")\n`;
         }
 
 
@@ -134,7 +215,7 @@ export class EmvDecoder {
 
         let buf: Buffer | undefined;
 
-        if (hexValue && hexValue.length % 2 == 0) {
+        if (hexValue && hexValue.length % 2 == 0 && !forceBase64) {
             buf = Buffer.from(hexValue, "hex");
             base64Value = buf.toString("base64");
             result += `B64 value: ${base64Value}\n`;

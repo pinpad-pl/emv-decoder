@@ -260,8 +260,257 @@
             }
         ]
 
-    }
+    },
 
+    {
+        "name": "Issuer Application Data (Visa) - 7 bytes",
+        "tag": "9F10",
+        "length": 7,
+        "bytes": [
+            {"06": "Length of issuer discretionary data"},
+            {"XX": "Derivation key index"},
+            {"XX": "Cryptogram version"},
+            {"03": "Length of the CVR"},
+            {
+                "XX": {
+                    "followAlias": "CVR_VISA",
+                    "length": 3
+                }
+            }
+        ]
+    },
+    {
+        "name": "Issuer Application Data (Visa) - 23 bytes",
+        "tag": "9F10",
+        "length": 23,
+        "bytes": [
+            {"06": "Length of issuer discretionary data"},
+            {"XX": "Derivation key index"},
+            {"XX": "Cryptogram version"},
+            {"03": "Length of the CVR"},
+            {
+                "XX": {
+                    "followAlias": "CVR_VISA",
+                    "length": 3
+                }
+            },
+            {
+                "XX": {
+                    "name": "IDD (Issuer Discretionary Data)",
+                    "length": 16
+                }
+            }        
+
+        ]
+
+    },
+    {
+        "name": "Issuer Application Data (CCD)",
+        "tag": "9F10",
+        "length": 32,
+        "bytes": [
+            {"XX": "Length indicator"},
+            {"XX": "CCI (Common Core Identifier)"},
+            {"XX": "DKI (Derivation Key Index)"},
+            {
+                "XX": {
+                    "followAlias": "CVR_CCD",
+                    "length": 5
+                }
+            },
+            {
+                "XX": {
+                    "name": "Counters (Contents at the discretion of Payment System)",
+                    "length": 8
+                }
+            },
+            {
+                "0F": "Length Indicator (Length of Issuer Discretionary Data field in IAD)"
+            },
+            {
+                "XX": {
+                    "name": "Issuer Discretionary Data",
+                    "length": 15
+                }
+            }
+
+
+        ]
+    },
+    {
+        "name": "Issuer Application Data (Mastercard) - 8 bytes",
+        "tag": "9F10",
+        "length": 8,
+        "bytes": [
+            {"XX": "Key Derivation Index"},
+            {"XX": "Cryptogram Verison number"},
+            {
+                "XX": {
+                    "followAlias": "CVR_MCHIP",
+                    "length": 6
+                }
+            }
+        ]
+    },
+    {
+        "name": "Issuer Application Data (Mastercard) - 18 bytes",
+        "tag": "9F10",
+        "length": 18,
+        "bytes": [
+            {"XX": "Key Derivation Index"},
+            {"XX": "Cryptogram Verison number"},
+            {
+                "XX": {
+                    "followAlias": "CVR_MCHIP",
+                    "length": 6
+                }
+            },
+            {
+                "XX": {
+                    "name": "DAC/ICC Dynamic Number",
+                    "length": 2
+                }
+            },
+            {
+                "XX": {
+                    "name": "Plaintext/Encrypted Counters (optional)",
+                    "length": 8
+                }
+            }
+        ]
+    },
+    {
+        "name": "Issuer Application Data (Mastercard) - 10 bytes",
+        "tag": "9F10",
+        "length": 10,
+        "bytes": [
+            {"XX": "Key Derivation Index"},
+            {"XX": "Cryptogram Verison number"},
+            {
+                "XX": {
+                    "followAlias": "CVR_MCHIP",
+                    "length": 6
+                }
+            },
+            {
+                "XX": {
+                    "name": "DAC/ICC Dynamic Number",
+                    "length": 2
+                }
+            }
+        ]
+    },
+
+    {
+        "name": "CVR (Card Verification Results) - CCD",
+        "alias": "CVR_CCD",
+        "length": 5,
+        "bits": [
+            "Issuer Authentication Failed",
+            "Issuer Authentication Not Performed",
+            "Offline DDA Performed",
+            "CDA Performed", 
+            "TC returned in 1-st GenAC",
+            "ARQC returned in 1-st GenAC",
+            "TC returned in 2-nd GenAC",
+            "Second GENERATE AC Not Requested",
+
+            "Last Online Transaction Not Completed", 
+            "PIN Try Limit Exceeded",
+            "PIN Not Successfully Verified",
+            "Offline PIN Verification Performed",
+            "PIN Try Counter (+1)", 
+            "PIN Try Counter (+2)", 
+            "PIN Try Counter (+4)", 
+            "PIN Try Counter (+8)",
+                    
+            "Issuer-discretionary bit 4", 
+            "Issuer-discretionary bit 3",
+            "Issuer-discretionary bit 2",
+            "Issuer-discretionary bit 1", 
+            "Upper Cumulative Offline Amount Limit Exceeded", 
+            "Lower Cumulative Offline Amount Limit Exceeded", 
+            "Upper Offline Transaction Count Limit Exceeded", 
+            "Lower Offline Transaction Count Limit Exceeded",
+
+            "Unable to go Online",
+            "Go Online on Next Transaction Was Set",
+            "Offline Data Authentication Failed on Previous Transaction",
+            "Issuer Script Processing Failed",
+            "Number of Successfully Processed Issuer Script Commands (+1)",
+            "Number of Successfully Processed Issuer Script Commands (+2)",
+            "Number of Successfully Processed Issuer Script Commands (+4)",
+            "Number of Successfully Processed Issuer Script Commands (+8)",
+            
+            "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU" 
+        ]
+    },
+    {
+        "name": "CVR (Card Verification Results) - M/Chip",
+        "alias": "CVR_MCHIP",
+        "length": 6,
+        "bits": [
+            "Offline PIN verification successfull",
+            "Offline ciphered PIN verification performed",
+            "Offline PIN verification performed",
+            "RFU", "RFU", "RFU", "RFU", "RFU",
+
+            "RFU", "RFU", "RFU", "RFU",
+            "Issuer authentication performed",
+            "RFU", "RFU", "RFU",
+
+            "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU",
+
+            "RFU", "RFU", "RFU",
+            "PIN try limit exceeded",
+            "Offline PIN verification failed",
+            "Offline PIN verification not performed",
+            "RFU", "RFU",
+
+            "RFU", "RFU",
+            "Issuer authentication not performed",
+            "Upper cumulative counter exceeded",
+            "RFU",
+            "Lower cumulative counter exceeded",
+            "Upper consecutive counter exceeded",
+            "Lower consecutive counter exceeded",
+
+            "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU", "RFU"
+        ]
+    }, 
+    {
+        "name": "CVR (Card Verification Results)",
+        "length": 3,
+        "alias": "CVR_VISA",
+        "bits": [
+            "Issuer Authentication Failed",
+            "Issuer Authentication Not Performed",
+            "Offline DDA Performed",
+            "CDA Performed",
+            "TC returned in 1-st GenAC",
+            "ARQC returned in 1-st GenAC",
+            "TC returned in 2-nd GenAC",
+            "Second GENERATE AC Not Requested",
+
+            "Offline static data authentication failed on last transaction",
+            "Application blocked by card because PIN Try Limit exceeded",
+            "Issuer Authentication not performed after online authorization",
+            "Issuer Authentication failure on last online transaction",
+            "New card",
+            "Exceeded velocity checking counters",
+            "PIN Try Limit exceeded",
+            "Last online transaction not completed",
+            
+            "PIN verification command not received for a PIN-Expecting card",
+            "Offline dynamic data authentication performed",
+            "Offline dynamic data authentication failed on last transaction",
+            "Issuer Script processing failed",
+            "Number of Issuer Script Commands (+1)",
+            "Number of Issuer Script Commands (+2)",
+            "Number of Issuer Script Commands (+4)",
+            "Number of Issuer Script Commands (+8)"
+        ]
+    }
 
 ]
 }

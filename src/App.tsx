@@ -4,7 +4,7 @@ import { EmvDecoder } from './EmvDecoder';
 
 
 const App = () => {
-    const valueFromUrl = new URLSearchParams(window.location.search)?.get("value");
+    const valueFromUrl = new URLSearchParams(window.location.search)?.get("value") || window.location.pathname.slice(1);
     const initialRsult = (valueFromUrl?.trim())? EmvDecoder.processValue(valueFromUrl) : "";
     const [result, setResult] = useState(initialRsult);
 
@@ -18,7 +18,7 @@ const App = () => {
                     onChangeText={inputValue => {
                         setResult(EmvDecoder.processValue(inputValue));
                         if (window.history.pushState) {
-                            const newurl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?value=' + encodeURIComponent(inputValue);
+                            const newurl = window.location.protocol + "//" + window.location.host + "/" + inputValue;
                             window.history.pushState({path:newurl},'',newurl);
                         }
                     } }
