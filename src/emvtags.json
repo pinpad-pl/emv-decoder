@@ -255,8 +255,9 @@
                 "09": "If transaction is in the application currency and is over Y value"
             },
             {
-                "00": "Success",
-                "01": "Failed"
+                "00": "Unknown",
+                "01": "Failed",
+                "02": "Success"
             }
         ]
 
@@ -509,6 +510,30 @@
             "Number of Issuer Script Commands (+2)",
             "Number of Issuer Script Commands (+4)",
             "Number of Issuer Script Commands (+8)"
+        ]
+    },
+    {
+        "name": "CVM capability (Kernel C-2/Mastercard)",
+        "length": 1,
+        "bits": [
+            "RFU", "RFU", "RFU",
+            "No CVM required",
+            "Enciphered PIN for offline verification",
+            "Signature (paper)",
+            "Enciphered PIN for online verification",
+            "Plaintext PIN for ICC verification"
+        ]
+    },
+    {
+        "name": "Security Capability (Kernel C-2/Mastercard)",
+        "length": 1,
+        "bits": [
+            "RFU", "RFU", "RFU",
+            "CDA",
+            "RFU",
+            "Card capture",
+            "DDA",
+            "SDA"
         ]
     }
 
