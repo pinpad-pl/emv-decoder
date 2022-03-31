@@ -10,7 +10,7 @@ interface EmvTag {
     bytes?: any[];
 }
 
-class DecodedTag  {
+class DecodedTags  {
     numberOfRFUs = 0;
     private static readonly INDENT_SIZE = 5;
 
@@ -28,11 +28,11 @@ class DecodedTag  {
     }
 
     increaseIndent(): void {
-        this.indentLevel += DecodedTag.INDENT_SIZE;
+        this.indentLevel += DecodedTags.INDENT_SIZE;
     }
 
     decreaseIndent(): void {
-        this.indentLevel -= DecodedTag.INDENT_SIZE;
+        this.indentLevel -= DecodedTags.INDENT_SIZE;
     }
 
 }
@@ -77,8 +77,8 @@ export class EmvDecoder {
         return undefined;
     }
 
-    private static decodeTag(buf: Buffer, emvTag: EmvTag, currentResult?: DecodedTag): DecodedTag {
-        const res = currentResult ??  new DecodedTag();
+    private static decodeTag(buf: Buffer, emvTag: EmvTag, currentResult?: DecodedTags): DecodedTags {
+        const res = currentResult ??  new DecodedTags();
 
 
         res.addToString(`${emvTag.name}: ${buf.toString('hex').toUpperCase()}`);
@@ -120,7 +120,7 @@ export class EmvDecoder {
                 }
                 if (typeof byteDesc == 'string') {
                     res.addToString(`Byte ${i + 1} (${hexByte}): ${byteDesc || "RFU"}`);
-                } else {
+                } else if (byteDesc !== undefined) {
                     const subTagLen = byteDesc.length;
                     if (subTagLen) {
                         console.log(`Subtag len on pos ${i}: ${subTagLen}`);
@@ -134,6 +134,8 @@ export class EmvDecoder {
                         j += subTagLen -1;
                         res.decreaseIndent();
                     }
+                } else {
+                    res.addToString("RFU");
                 }
                 if (byteDesc == "RFU" || !byteDesc) {
                     res.numberOfRFUs++;
@@ -147,7 +149,7 @@ export class EmvDecoder {
     private static decodeTags(buf: Buffer): string {
         let res = "";
         console.log("Looking for matching tags");
-        const decodedTags: DecodedTag[] = [];
+        const decodedTags: DecodedTags[] = [];
         for(const tag of tags.emvTags) {
             if (tag.length == buf.length) {
                 console.log(`Matching length for tag ${tag.name}`);

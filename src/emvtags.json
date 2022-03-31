@@ -343,7 +343,7 @@
         "length": 8,
         "bytes": [
             {"XX": "Key Derivation Index"},
-            {"XX": "Cryptogram Verison number"},
+            {"XX": "Cryptogram Version number"},
             {
                 "XX": {
                     "followAlias": "CVR_MCHIP",
@@ -358,7 +358,7 @@
         "length": 18,
         "bytes": [
             {"XX": "Key Derivation Index"},
-            {"XX": "Cryptogram Verison number"},
+            {"XX": "Cryptogram Version number"},
             {
                 "XX": {
                     "followAlias": "CVR_MCHIP",
@@ -385,7 +385,7 @@
         "length": 10,
         "bytes": [
             {"XX": "Key Derivation Index"},
-            {"XX": "Cryptogram Verison number"},
+            {"XX": "Cryptogram Version number"},
             {
                 "XX": {
                     "followAlias": "CVR_MCHIP",
