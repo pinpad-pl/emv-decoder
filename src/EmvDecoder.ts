@@ -1,5 +1,7 @@
 import { Buffer } from "buffer";
+import { DecodingResult } from "./DecodedTags";
 import tags from './emvtags.json';
+import { TlvParser } from "./TlvParser";
 
 interface EmvTag {
     name: string;
@@ -10,33 +12,6 @@ interface EmvTag {
     bytes?: any[];
 }
 
-class DecodedTags  {
-    numberOfRFUs = 0;
-    private static readonly INDENT_SIZE = 5;
-
-
-    private result = "";
-    private indentLevel = 0;
-
-    getResult(): string {
-        return this.result;
-    }
-
-    addToString(newString: string): void {
-        const indent = (this.indentLevel && this.indentLevel < 20)? "                    ".slice(0, this.indentLevel) : "";
-        this.result += `${indent}${newString}\n`;
-    }
-
-    increaseIndent(): void {
-        this.indentLevel += DecodedTags.INDENT_SIZE;
-    }
-
-    decreaseIndent(): void {
-        this.indentLevel -= DecodedTags.INDENT_SIZE;
-    }
-
-}
-
 export class EmvDecoder {
 
     private static findEmvTag(alias: string): EmvTag | undefined {
@@ -45,6 +20,16 @@ export class EmvDecoder {
                 return tag;
             }
         }
+        return undefined;
+    }
+
+    private static findEmvTagbyId(tagId: string): EmvTag | undefined {
+        for (const tag of tags.emvTags) {
+            if (tag.tag == tagId) {
+                return tag;
+            }
+        }
+        return undefined;
     }
 
     private static validateTagsArray(tagsArray: EmvTag[]) {
@@ -77,14 +62,27 @@ export class EmvDecoder {
         return undefined;
     }
 
-    private static decodeTag(buf: Buffer, emvTag: EmvTag, currentResult?: DecodedTags): DecodedTags {
-        const res = currentResult ??  new DecodedTags();
+    static decodeTag(buf: Buffer, emvTag: EmvTag | string, currentResult?: DecodingResult): DecodingResult {
+        const res = currentResult ??  new DecodingResult();
+        let isTlv = false;
 
 
-        res.addToString(`${emvTag.name}: ${buf.toString('hex').toUpperCase()}`);
+        if (typeof emvTag === 'string') {
+            const foundTag = this.findEmvTagbyId(emvTag);
+            if (foundTag === undefined) {
+                return res;
+            }
+            emvTag = foundTag;
+            isTlv = true;
+        }
 
-        if (emvTag.tag) {
-            res.addToString(`TAG: ${emvTag.tag}`);
+
+        if (!isTlv) {
+            res.addToString(`${emvTag.name}: ${buf.toString('hex').toUpperCase()}`);
+
+            if (emvTag.tag) {
+                res.addToString(`TAG: ${emvTag.tag}`);
+            }
         }
 
         res.addToString("");
@@ -149,7 +147,7 @@ export class EmvDecoder {
     private static decodeTags(buf: Buffer): string {
         let res = "";
         console.log("Looking for matching tags");
-        const decodedTags: DecodedTags[] = [];
+        const decodedTags: DecodingResult[] = [];
         for(const tag of tags.emvTags) {
             if (tag.length == buf.length) {
                 console.log(`Matching length for tag ${tag.name}`);
@@ -236,7 +234,13 @@ export class EmvDecoder {
         if (invalidTag) {
             result += `ERROR: Invalid definition of tag ${invalidTag}`;
         } else {
-            result += this.decodeTags(buf);
+            const decodedTlv = new TlvParser(buf).decode().getResult();
+            if (decodedTlv) {
+                result += "TLV struct:\n" + decodedTlv;
+            } else {
+                result += this.decodeTags(buf);
+            }
+
         }
 
         return result;

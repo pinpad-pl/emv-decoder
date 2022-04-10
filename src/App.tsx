@@ -1,6 +1,10 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 import React, {useState} from 'react';
 import {Text, View, TextInput} from 'react-native';
 import { EmvDecoder } from './EmvDecoder';
+
+// eslint-disable-next-line no-undef
+global.Buffer = global.Buffer || require('buffer').Buffer;
 
 
 const App = () => {
