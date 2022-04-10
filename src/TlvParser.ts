@@ -13,7 +13,7 @@ export class TlvParser {
         this.decodingResult.addToString(`TAG ${tag.getTag()} (${tag.getName()}): ${tag.value}`);
         if (tag.getChild().length == 0) {
             console.log(`value for tag ${tag.getTag()}: ${tag.value}`);
-            EmvDecoder.decodeTag(Buffer.from(tag.value), tag.getTag(), this.decodingResult);
+            EmvDecoder.decodeTag(Buffer.from(tag.value, "hex"), tag.getTag(), this.decodingResult);
         }
         this.decodingResult.increaseIndent();
         for (const child of tag.getChild()) {
