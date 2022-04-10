@@ -4,7 +4,8 @@ This repo contains sources of the application deployed here: https://emv.pinpad.
 Just enter any value (HEX or BASE64), and the app will try to parse and/or decode it.
 For example:
 
- https://emv.pinpad.pl/95050000000001 \
+ https://emv.pinpad.pl/95050000000001 
+
  https://emv.pinpad.pl/0000000001
 
 
