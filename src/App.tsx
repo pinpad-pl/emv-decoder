@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import React, {useState} from 'react';
+import {useState} from 'react';
 import {Text, View, TextInput} from 'react-native';
 import { EmvDecoder } from './EmvDecoder';
 
@@ -7,8 +7,8 @@ import { EmvDecoder } from './EmvDecoder';
 global.Buffer = global.Buffer || require('buffer').Buffer;
 
 
-const App = () => {
-    const valueFromUrl = new URLSearchParams(window.location.search)?.get("value") || window.location.pathname.slice(1);
+const App = (): JSX.Element => {
+    const valueFromUrl = new URLSearchParams(window.location.search)?.get("value") || decodeURIComponent(window.location.pathname.slice(1));
     const initialRsult = (valueFromUrl?.trim())? EmvDecoder.processValue(valueFromUrl) : "";
     const [result, setResult] = useState(initialRsult);
 

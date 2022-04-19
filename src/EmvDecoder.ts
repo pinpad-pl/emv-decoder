@@ -163,7 +163,7 @@ export class EmvDecoder {
     }
 
     static processValue(value: string): string {
-        value = value.trim();
+        value = decodeURIComponent(value).replace(/\s/g, '');
 
         if (!value) {
             return "";
