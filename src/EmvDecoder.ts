@@ -234,9 +234,17 @@ export class EmvDecoder {
         if (invalidTag) {
             result += `ERROR: Invalid definition of tag ${invalidTag}`;
         } else {
-            const decodedTlv = new TlvParser(buf).decode().getResult();
+            let decodedTlv = new TlvParser(buf).decode().getResult();
+            let statusWord = "";
+            if (!decodedTlv) {
+                decodedTlv = new TlvParser(buf.subarray(0, buf.length -2)).decode().getResult();
+                statusWord = buf.subarray(buf.length -2).toString("hex");
+            }
             if (decodedTlv) {
                 result += "TLV struct:\n" + decodedTlv;
+                if (statusWord) {
+                    result += "\nSTATUS WORD: " + statusWord + "\n";
+                }
             } else {
                 result += this.decodeTags(buf);
             }
